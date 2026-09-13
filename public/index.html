@@ -266,6 +266,53 @@
       color: var(--yellow);
     }
 
+    /* ================= TAHEREH MODE TOGGLE ================= */
+
+    .mode-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .tah-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+
+    .tah-toggle:hover {
+      border-color: var(--muted-2);
+      color: var(--text);
+    }
+
+    .tah-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted-2);
+      transition: background .2s, box-shadow .2s;
+    }
+
+    .tah-toggle.active {
+      border-color: rgba(239,111,163,.45);
+      background: rgba(239,111,163,.1);
+      color: #f6a9c8;
+    }
+
+    .tah-toggle.active .tah-dot {
+      background: #ef6fa3;
+      box-shadow: 0 0 10px rgba(239,111,163,.7);
+    }
+
     /* ================= GRID ================= */
 
     .grid {
@@ -310,17 +357,40 @@
 
     .lane {
       flex: 0 0 auto;
-      width: 22px;
-      height: 22px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      color: var(--muted-2);
-      font-size: 10px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -.2px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 4px 14px rgba(0,0,0,.25);
+    }
+
+    .chatgpt .lane {
+      background: linear-gradient(145deg, #17c99a, #0d8b6c);
+    }
+
+    .claude .lane {
+      background: linear-gradient(145deg, #e2916a, #c15f3e);
+    }
+
+    .gemini .lane {
+      background: linear-gradient(145deg, #5b9dff, #9a6bff);
+    }
+
+    .grok .lane {
+      background: linear-gradient(145deg, #3a3d46, #101116);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .lane img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
     }
 
     .model-chip {
@@ -329,11 +399,6 @@
       border-radius: 50%;
       flex: 0 0 auto;
     }
-
-    .chatgpt .model-chip { background: var(--gpt); }
-    .claude .model-chip { background: var(--claude); }
-    .gemini .model-chip { background: var(--gemini); }
-    .grok .model-chip { background: var(--grok); }
 
     .model-chip.mc-chatgpt { background: var(--gpt); }
     .model-chip.mc-claude { background: var(--claude); }
@@ -690,6 +755,84 @@
       color: var(--text);
     }
 
+    .toolbar {
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .new-chat-btn {
+      border-color: rgba(242,164,68,.3) !important;
+      color: var(--amber) !important;
+      background: var(--amber-dim) !important;
+    }
+
+    /* ================= SESSIONS PANEL ================= */
+
+    .sessions-panel {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      z-index: 20;
+      width: min(360px, 100%);
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+
+    .sessions-panel.visible {
+      display: block;
+    }
+
+    .session-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      transition: background .15s;
+    }
+
+    .session-item:last-child {
+      border-bottom: none;
+    }
+
+    .session-item:hover {
+      background: var(--panel);
+    }
+
+    .session-item .s-title {
+      font-size: 12px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .session-item .s-meta {
+      font-size: 10px;
+      color: var(--muted-2);
+      direction: ltr;
+      text-align: right;
+    }
+
+    .sessions-empty {
+      padding: 16px 14px;
+      color: var(--muted-2);
+      font-size: 11px;
+      text-align: center;
+    }
+
     /* ================= TOAST ================= */
 
     .toast {
@@ -785,6 +928,13 @@
 
 
     <section class="input-wrapper">
+      <div class="mode-row">
+        <button type="button" class="tah-toggle" id="tahModeBtn">
+          <span class="tah-dot"></span>
+          حالت طاهره — پاسخ دقیق‌تر و کامل‌تر
+        </button>
+      </div>
+
       <div class="input-box">
         <textarea
           id="question"
@@ -812,8 +962,7 @@
       <!-- CHATGPT -->
       <article class="card chatgpt" id="card-chatgpt">
         <div class="card-head">
-          <span class="lane">۱</span>
-          <span class="model-chip"></span>
+          <span class="lane"><img src="https://cdn.simpleicons.org/openai/ffffff" alt="ChatGPT"></span>
           <div class="card-head-text">
             <h3>ChatGPT</h3>
             <div class="version" id="v-chatgpt">در انتظار اتصال</div>
@@ -831,8 +980,7 @@
       <!-- CLAUDE -->
       <article class="card claude" id="card-claude">
         <div class="card-head">
-          <span class="lane">۲</span>
-          <span class="model-chip"></span>
+          <span class="lane"><img src="https://cdn.simpleicons.org/anthropic/ffffff" alt="Claude"></span>
           <div class="card-head-text">
             <h3>Claude</h3>
             <div class="version" id="v-claude">در انتظار اتصال</div>
@@ -850,8 +998,7 @@
       <!-- GEMINI -->
       <article class="card gemini" id="card-gemini">
         <div class="card-head">
-          <span class="lane">۳</span>
-          <span class="model-chip"></span>
+          <span class="lane"><img src="https://cdn.simpleicons.org/googlegemini/ffffff" alt="Gemini"></span>
           <div class="card-head-text">
             <h3>Gemini</h3>
             <div class="version" id="v-gemini">در انتظار اتصال</div>
@@ -869,8 +1016,7 @@
       <!-- GROK -->
       <article class="card grok" id="card-grok">
         <div class="card-head">
-          <span class="lane">۴</span>
-          <span class="model-chip"></span>
+          <span class="lane"><img src="https://cdn.simpleicons.org/x/ffffff" alt="Grok"></span>
           <div class="card-head-text">
             <h3>Grok</h3>
             <div class="version" id="v-grok">در انتظار اتصال</div>
@@ -899,8 +1045,15 @@
 
 
     <div class="toolbar">
-      <button class="clear-btn" id="clearBtn" type="button">پاک کردن تاریخچه</button>
-      <button class="export-btn" id="exportBtn" type="button">ذخیره مکالمه</button>
+      <div class="toolbar-group">
+        <button class="new-chat-btn" id="newChatBtn" type="button">چت جدید</button>
+        <button class="history-btn" id="historyBtn" type="button">چت‌های قبلی</button>
+        <div class="sessions-panel" id="sessionsPanel"></div>
+      </div>
+      <div class="toolbar-group">
+        <button class="clear-btn" id="clearBtn" type="button">پاک کردن تاریخچه</button>
+        <button class="export-btn" id="exportBtn" type="button">ذخیره مکالمه</button>
+      </div>
     </div>
 
   </main>
@@ -913,6 +1066,16 @@
     const ids = ["chatgpt", "claude", "gemini", "grok"];
     const MAX_MESSAGES = 30;
     const STORAGE_KEY = "ai_compare_histories_v2";
+
+    const SESSIONS_KEY = "ai_arena_sessions_v1";
+    const MAX_SESSIONS = 2;
+    const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 1 day
+
+    const TAH_MODE_KEY = "ai_arena_tahereh_mode";
+    const TAHEREH_PROMPT =
+      "پاسخ‌ها را بسیار دقیق، کامل و با جزئیات کافی بنویس. جایی که لازم است مثال، استدلال گام‌به‌گام و نکات ریز را هم اضافه کن. از خلاصه‌گویی و کلی‌گویی خودداری کن و مطمئن شو هیچ سؤال احتمالی بعدی بی‌جواب نمی‌ماند.";
+
+    let tahMode = false;
 
     let histories = { chatgpt: [], claude: [], gemini: [], grok: [] };
     let controller = null;
@@ -940,6 +1103,186 @@
       } catch (error) {
         console.warn("خواندن تاریخچه ممکن نشد:", error);
       }
+    }
+
+    /* ================= SESSIONS (چت جدید / چت‌های قبلی) ================= */
+
+    function getSessions() {
+      try {
+        const raw = localStorage.getItem(SESSIONS_KEY);
+        if (!raw) return [];
+
+        let sessions = JSON.parse(raw);
+        if (!Array.isArray(sessions)) return [];
+
+        const now = Date.now();
+
+        // حذف چت‌هایی که بیشتر از یک روز از ذخیره‌شون گذشته
+        sessions = sessions.filter(s => s && (now - s.savedAt) < SESSION_TTL_MS);
+
+        // فقط ۲ تای آخر نگه داشته می‌شود
+        sessions = sessions.slice(-MAX_SESSIONS);
+
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+
+        return sessions;
+      } catch (error) {
+        console.warn("خواندن چت‌های ذخیره‌شده ممکن نشد:", error);
+        return [];
+      }
+    }
+
+    function saveSessions(sessions) {
+      try {
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions.slice(-MAX_SESSIONS)));
+      } catch (error) {
+        console.warn("ذخیره چت ممکن نشد:", error);
+      }
+    }
+
+    function makeSessionTitle() {
+      for (const id of ids) {
+        const firstUser = (histories[id] || []).find(m => m.role === "user");
+        if (firstUser && firstUser.content) {
+          const text = firstUser.content.trim();
+          return text.length > 42 ? text.slice(0, 42) + "…" : text;
+        }
+      }
+      return "چت بدون عنوان";
+    }
+
+    function hasAnyHistory() {
+      return ids.some(id => histories[id].length > 0);
+    }
+
+    function formatSessionTime(ts) {
+      const diffMs = Date.now() - ts;
+      const diffMin = Math.round(diffMs / 60000);
+      if (diffMin < 1) return "همین الان";
+      if (diffMin < 60) return diffMin + " دقیقه پیش";
+      const diffHour = Math.round(diffMin / 60);
+      return diffHour + " ساعت پیش";
+    }
+
+    function startNewChat() {
+      if (hasAnyHistory()) {
+        const sessions = getSessions();
+        sessions.push({
+          id: Date.now(),
+          title: makeSessionTitle(),
+          savedAt: Date.now(),
+          histories: JSON.parse(JSON.stringify(histories))
+        });
+        saveSessions(sessions);
+      }
+
+      histories = { chatgpt: [], claude: [], gemini: [], grok: [] };
+      localStorage.removeItem(STORAGE_KEY);
+
+      ids.forEach(id => {
+        document.getElementById("msgs-" + id).innerHTML =
+          '<div class="empty-hint">منتظر اولین سؤال تو هستم</div>';
+        document.getElementById("v-" + id).innerText = "در انتظار اتصال";
+        setModelStatus(id, "", "آماده");
+      });
+
+      document.getElementById("judgePanel").classList.remove("visible");
+      document.getElementById("sessionsPanel").classList.remove("visible");
+      setGlobalStatus("آماده دریافت سؤال");
+      document.getElementById("question").focus();
+      showToast("چت جدید شروع شد");
+    }
+
+    function renderSessionsPanel() {
+      const panel = document.getElementById("sessionsPanel");
+      const sessions = getSessions().slice().reverse(); // جدیدترین بالا
+
+      if (!sessions.length) {
+        panel.innerHTML = '<div class="sessions-empty">هنوز چتی ذخیره نشده</div>';
+        return;
+      }
+
+      panel.innerHTML = "";
+
+      sessions.forEach(session => {
+        const item = document.createElement("div");
+        item.className = "session-item";
+        item.innerHTML =
+          '<span class="s-title"></span>' +
+          '<span class="s-meta"></span>';
+
+        item.querySelector(".s-title").innerText = session.title;
+        item.querySelector(".s-meta").innerText = formatSessionTime(session.savedAt);
+
+        item.addEventListener("click", () => loadSession(session.id));
+        panel.appendChild(item);
+      });
+    }
+
+    function loadSession(sessionId) {
+      const sessions = getSessions();
+      const session = sessions.find(s => s.id === sessionId);
+      if (!session) {
+        showToast("این چت دیگر در دسترس نیست");
+        renderSessionsPanel();
+        return;
+      }
+
+      histories = JSON.parse(JSON.stringify(session.histories));
+      ids.forEach(id => {
+        if (!histories[id]) histories[id] = [];
+      });
+
+      renderAllHistory();
+      saveHistory();
+      document.getElementById("judgePanel").classList.remove("visible");
+      document.getElementById("sessionsPanel").classList.remove("visible");
+      showToast("چت بارگذاری شد");
+    }
+
+    function toggleSessionsPanel() {
+      const panel = document.getElementById("sessionsPanel");
+      const willShow = !panel.classList.contains("visible");
+      if (willShow) renderSessionsPanel();
+      panel.classList.toggle("visible", willShow);
+    }
+
+    /* ================= حالت طاهره ================= */
+
+    function loadTahMode() {
+      try {
+        tahMode = localStorage.getItem(TAH_MODE_KEY) === "1";
+      } catch {
+        tahMode = false;
+      }
+      renderTahMode();
+    }
+
+    function renderTahMode() {
+      const btn = document.getElementById("tahModeBtn");
+      btn.classList.toggle("active", tahMode);
+    }
+
+    function toggleTahMode() {
+      tahMode = !tahMode;
+      try {
+        localStorage.setItem(TAH_MODE_KEY, tahMode ? "1" : "0");
+      } catch {}
+      renderTahMode();
+      showToast(tahMode ? "حالت طاهره فعال شد ✨" : "حالت طاهره خاموش شد");
+    }
+
+    function buildPayloadHistories() {
+      const payload = {};
+      ids.forEach(id => {
+        const list = tahMode
+          ? histories[id].slice(-(MAX_MESSAGES - 1))
+          : histories[id].slice();
+        payload[id] = tahMode
+          ? [{ role: "system", content: TAHEREH_PROMPT }, ...list]
+          : list;
+      });
+      return payload;
     }
 
     function showToast(message) {
@@ -1090,11 +1433,13 @@
 
       saveHistory();
 
+      const payloadHistories = buildPayloadHistories();
+
       try {
         const res = await fetch("/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ histories }),
+          body: JSON.stringify({ histories: payloadHistories }),
           signal: controller.signal
         });
 
@@ -1319,6 +1664,17 @@
     document.getElementById("stopBtn").addEventListener("click", stopGeneration);
     document.getElementById("clearBtn").addEventListener("click", clearAll);
     document.getElementById("exportBtn").addEventListener("click", exportConversation);
+    document.getElementById("newChatBtn").addEventListener("click", startNewChat);
+    document.getElementById("historyBtn").addEventListener("click", toggleSessionsPanel);
+    document.getElementById("tahModeBtn").addEventListener("click", toggleTahMode);
+
+    document.addEventListener("click", event => {
+      const panel = document.getElementById("sessionsPanel");
+      const historyBtn = document.getElementById("historyBtn");
+      if (!panel.contains(event.target) && event.target !== historyBtn) {
+        panel.classList.remove("visible");
+      }
+    });
 
     document.getElementById("question").addEventListener("input", () => {
       autoResize();
@@ -1333,6 +1689,8 @@
     });
 
     loadHistory();
+    getSessions(); // پاک‌سازی چت‌های منقضی‌شده (بیشتر از یک روز)
+    loadTahMode();
     updateCharCount();
     autoResize();
     document.getElementById("question").focus();
