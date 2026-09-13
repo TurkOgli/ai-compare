@@ -190,7 +190,31 @@ ${answers.grok}
   }
 
   try {
-    return { success: true, data: JSON.parse(result.content) };
+    const cleaned = result.content
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
+    const data = JSON.parse(cleaned);
+
+    const modelKeys = Object.keys(MODELS);
+    const validWinner = modelKeys.includes(data.winner) ? data.winner : null;
+
+    const scores = {};
+    modelKeys.forEach((key) => {
+      const raw = Number(data.scores?.[key]);
+      scores[key] = Number.isFinite(raw) ? Math.max(0, Math.min(10, raw)) : 0;
+    });
+
+    return {
+      success: true,
+      data: {
+        winner: validWinner,
+        scores,
+        reason: typeof data.reason === 'string' ? data.reason : '',
+        summary: typeof data.summary === 'string' ? data.summary : '',
+      },
+    };
   } catch {
     return { success: false, error: 'خروجی داور JSON معتبر نبود' };
   }
